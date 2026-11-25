@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.22)
+project(SemitoneCalculator VERSION 1.10 LANGUAGES C CXX)
+set(JUCE_PATH "C:/JUCE" CACHE PATH "Path to the JUCE sources")
+add_subdirectory("${JUCE_PATH}" JUCE)
+include(cmake/PluginRuntime.cmake)
+set(formats VST3 Standalone)
+if(APPLE)
+    list(APPEND formats AU)
+endif()
+set(st "${CMAKE_CURRENT_SOURCE_DIR}/Source/SoundTouch")
+add_soundtouch_runtime(SemitoneSoundTouch "${st}" "${st}" "${st}/COPYING.TXT")
+
+juce_add_plugin(SemitoneCalculator FORMATS ${formats}
+    COMPANY_NAME "metarealization>" PRODUCT_NAME "SemitoneCalculator"
+    PLUGIN_MANUFACTURER_CODE Manu PLUGIN_CODE Iyes BUNDLE_ID com.metarealization.SemitoneCalculator)
+juce_generate_juce_header(SemitoneCalculator)
+target_sources(SemitoneCalculator PRIVATE Source/PluginProcessor.cpp Source/PluginEditor.cpp)
+target_compile_features(SemitoneCalculator PUBLIC cxx_std_17)
+target_compile_definitions(SemitoneCalculator PUBLIC JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
+target_link_libraries(SemitoneCalculator PRIVATE juce::juce_audio_utils SemitoneSoundTouch)
+foreach(format IN LISTS formats)
+    package_plugin(SemitoneCalculator ${format} SemitoneSoundTouch "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+endforeach()

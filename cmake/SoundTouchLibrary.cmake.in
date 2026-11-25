@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.22)
+project(@runtime@ LANGUAGES CXX)
+file(GLOB sources CONFIGURE_DEPENDS "*.cpp")
+add_library(@runtime@ SHARED ${sources})
+target_include_directories(@runtime@ PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_features(@runtime@ PRIVATE cxx_std_17)
+set_target_properties(@runtime@ PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON
+    MACOSX_RPATH ON BUILD_WITH_INSTALL_NAME_DIR ON INSTALL_NAME_DIR "@rpath")
